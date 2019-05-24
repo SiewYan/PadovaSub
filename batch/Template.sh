@@ -19,13 +19,15 @@ echo
 env > local.env
 env
 
-sed -i 's/1111111/XXXX/g' YYYYYY.sh
+sed -i 's/1111111/XXXX/g' cmsRun_cfg.py
+#sed -i 's/1111111/XXXX/g' YYYYYY.sh
 echo "running"
 
-./YYYYYY.sh
+cmsRun cmsRun_cfg.py
+#./YYYYYY.sh
 
-mv YYYYYY_XXXX.root ${WorkingDir}/sherpa_YYYYYY_XXXX_GEN_SIM.root
+mv YYYYYY_XXXX.root ${WorkingDir}/madgraph_YYYYYY_XXXX_GEN_SIM.root
 echo "Cleaning up"
-#rm -rf ${TMPDir}/batch_YYYYYY_XXXX
+rm -rf ${TMPDir}/batch_YYYYYY_XXXX
 exit $?
 echo ""
