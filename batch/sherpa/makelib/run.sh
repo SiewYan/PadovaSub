@@ -1,3 +1,5 @@
 #!/bin/bash
 
-./makeJob.sh g2jets 1 local-cms-short 1
+#local-cms-short
+
+./makeJob.sh g2jets 1 local-cms-long 0
