@@ -5,6 +5,7 @@
 work=$1
 njobs=$2
 queue=$3
+dryrun=$4
 
 for job in `seq 1 1 $njobs`
 do
@@ -16,7 +17,12 @@ do
     sed -i 's/YYYYYY/'${work}'/g' jobs/job_${RANDOMSEED}.sh
     ##
     chmod 755 jobs/job_${RANDOMSEED}.sh
-    echo "bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh"
-    bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh
+    if [ "$dryrun" -eq 0 ] || [ -z "$dryrun" ];then
+	echo "bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh"
+	bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh
+    else
+	echo "Dry Run"
+	echo "bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh"
+	ls .
+    fi
 done
-
