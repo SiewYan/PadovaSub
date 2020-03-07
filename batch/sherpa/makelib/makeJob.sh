@@ -24,7 +24,6 @@ do
     if [ "$dryrun" -eq 0 ] || [ -z "$dryrun" ];then
 	echo "bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh"
 	bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh
-	bqueues
     else
 	echo "Dry Run"
 	echo "bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh"
