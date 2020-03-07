@@ -1,28 +1,40 @@
-#!/bin/bash
+#!/bin/sh
 
-## add the script in PATH
+if [ "$2" == "no" ];then
+    weightsFrag="no"
+else
+    weightsFrag=`echo $2 | awk -F "_" '{print $1}'`
+fi
 
-work=$1
-njobs=$2
-queue=$3
-dryrun=$4
+cp -rf SHERPAtmpl.job sherpa_$1_${weightsFrag}.job
+rm -rf temp
 
-for job in `seq 1 1 $njobs`
-do
-    RANDOMSEED=`od -vAn -N4 -tu4 < /dev/urandom`
-    RANDOMSEED=`echo $RANDOMSEED | rev | cut -c 3- | rev`
-    scp Template.sh jobs/job_${RANDOMSEED}.sh
-    ##sub
-    sed -i 's/XXXX/'${RANDOMSEED}'/g' jobs/job_${RANDOMSEED}.sh
-    sed -i 's/YYYYYY/'${work}'/g' jobs/job_${RANDOMSEED}.sh
-    ##
-    chmod 755 jobs/job_${RANDOMSEED}.sh
-    if [ "$dryrun" -eq 0 ] || [ -z "$dryrun" ];then
-	echo "bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh"
-	bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh
-    else
-	echo "Dry Run"
-	echo "bsub -q $queue -o jobs/job_${RANDOMSEED}_logs < jobs/job_${RANDOMSEED}.sh"
-	ls .
-    fi
-done
+#chaging some environmental variable
+DIR=`pwd -P`
+sed  s#INPUT01#${CMSSW_BASE}#g sherpa_$1_${weightsFrag}.job > temp
+mv temp sherpa_$1_${weightsFrag}.job
+
+sed  s#INPUT02#${DIR}#g sherpa_$1_${weightsFrag}.job > temp
+mv temp sherpa_$1_${weightsFrag}.job
+ 
+#$1
+sed s/INPUT1/$1/g sherpa_$1_${weightsFrag}.job > temp
+mv temp sherpa_$1_${weightsFrag}.job
+#$2
+if [ "$2" == "no" ];then
+    sed s/INPUT2/""/g sherpa_$1_${weightsFrag}.job > temp
+    mv temp sherpa_$1_${weightsFrag}.job
+else
+    sed s/INPUT2/$2/g sherpa_$1_${weightsFrag}.job > temp
+    mv temp sherpa_$1_${weightsFrag}.job
+fi
+
+#$3
+sed s/XX_NEVENT_XX/$3/g sherpa_$1_${weightsFrag}.job > temp
+mv temp sherpa_$1_${weightsFrag}.job
+
+##
+chmod a+x sherpa_$1_${weightsFrag}.job
+
+## Send job
+bsub -R "rusage[mem=4000]" -q $4 -o Log_$1_${weightsFrag} sherpa_$1_${weightsFrag}.job
